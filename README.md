@@ -31,6 +31,11 @@ QBitChain is a minimal, yet production-ready, quantum-resistant blockchain imple
    cd qbitchain
    ```
 
+3. Install dependencies:
+  ```bash
+  go mod tidy
+  ```
+
 2. Build the application:
    ```bash
    go build -o qbitchain ./cmd/qbitchain
