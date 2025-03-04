@@ -84,7 +84,11 @@ func main() {
 	if err := node.Start(); err != nil {
 		log.Fatalf("Failed to start node: %v", err)
 	}
-	defer node.Stop()
+	defer func() {
+		if err := node.Stop(); err != nil {
+			log.Printf("Error stopping node: %v", err)
+		}
+	}()
 
 	fmt.Printf("QBitChain node started (Network: %s, Full Node: %v, Miner: %v)\n", 
 		cfg.NetworkType, isFullNode, isMiner)

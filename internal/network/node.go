@@ -2,11 +2,13 @@ package network
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
 
+	"github.com/ipfs/go-cid"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/network"
@@ -14,6 +16,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/protocol"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	"github.com/multiformats/go-multiaddr"
+	"github.com/multiformats/go-multihash"
 	
 	"github.com/seagercortez/qbitchain/internal/blockchain"
 	"github.com/seagercortez/qbitchain/internal/mining"
@@ -323,22 +326,53 @@ func (n *Node) discoverPeers() {
 		case <-n.ctx.Done():
 			return
 		case <-ticker.C:
-			// Look for peers with the QBitChain protocol
-			peers, err := n.dht.FindPeers(n.ctx, PeerDiscoveryID)
-			if err != nil {
-				fmt.Printf("Failed to find peers: %v\n", err)
-				continue
-			}
+			// Create a CID from our discovery ID for DHT
+			discoveryHash := sha256.Sum256([]byte(PeerDiscoveryID))
+			mh, _ := multihash.Encode(discoveryHash[:], multihash.SHA2_256)
+			discoveryID := cid.NewCidV1(cid.Raw, mh)
 			
-			// Connect to the discovered peers
-			for p := range peers {
+			// Look for providers of our discovery service
+			ctx, cancel := context.WithTimeout(n.ctx, 30*time.Second)
+			providers := n.dht.FindProvidersAsync(ctx, discoveryID, 20)
+			
+			// Process discovered peers
+			peerCount := 0
+			for p := range providers {
+				if peerCount >= 20 {
+					cancel() // Found enough peers
+					break
+				}
+				peerCount++
+				
 				// Skip if it's us
 				if p.ID == n.host.ID() {
 					continue
 				}
 				
+				// Connect to the peer if we have addresses
+				if len(p.Addrs) > 0 {
+					n.host.Connect(n.ctx, peer.AddrInfo{
+						ID:    p.ID,
+						Addrs: p.Addrs,
+					})
+					// Add the peer to our list
+					if len(p.Addrs) > 0 {
+						n.addPeer(p.ID, p.Addrs[0])
+					}
+				}
+			}
+			cancel() // Ensure the context is canceled
+			
+			// Also try to find peers from our routing table
+			peers := n.host.Network().Peers()
+			for _, p := range peers {
+				// Skip if it's us
+				if p == n.host.ID() {
+					continue
+				}
+				
 				// Skip if we're already connected to this peer
-				if n.isPeerConnected(p.ID) {
+				if n.isPeerConnected(p) {
 					continue
 				}
 				
@@ -347,15 +381,23 @@ func (n *Node) discoverPeers() {
 					break
 				}
 				
+				// Get addresses for the peer
+				peerInfo := n.host.Peerstore().PeerInfo(p)
+				
+				// Skip if no addresses
+				if len(peerInfo.Addrs) == 0 {
+					continue
+				}
+				
 				// Connect to the peer
-				err := n.host.Connect(n.ctx, p)
+				err := n.host.Connect(n.ctx, peerInfo)
 				if err != nil {
-					fmt.Printf("Failed to connect to peer %s: %v\n", p.ID, err)
+					fmt.Printf("Failed to connect to peer %s: %v\n", p, err)
 					continue
 				}
 				
 				// Add the peer to our list
-				n.addPeer(p.ID, p.Addrs[0])
+				n.addPeer(p, peerInfo.Addrs[0])
 			}
 		}
 	}

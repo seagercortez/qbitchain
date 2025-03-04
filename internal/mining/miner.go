@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/seagercortez/qbitchain/internal/blockchain"
-	"github.com/seagercortez/qbitchain/internal/crypto"
 	"github.com/seagercortez/qbitchain/pkg/config"
 )
 

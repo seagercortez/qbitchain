@@ -16,7 +16,7 @@ const (
 	// Initial mining difficulty target
 	InitialDifficulty = 20
 	// BlockReward is the reward for mining a block (in QBit / 10^18)
-	BlockReward = 50 * 1e18
+	BlockReward uint64 = 5_000_000_000_000_000_000 // 5 billion * 10^18 (5 quintillion)
 	// Target block time in seconds
 	TargetBlockTime = 60
 	// Difficulty adjustment interval (in blocks)

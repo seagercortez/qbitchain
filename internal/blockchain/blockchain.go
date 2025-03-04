@@ -7,9 +7,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"os"
 	"sync"
 	"time"
 
+	"github.com/seagercortez/qbitchain/internal/crypto"
 	"github.com/seagercortez/qbitchain/pkg/config"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/opt"
@@ -124,8 +126,7 @@ func NewBlockchain(cfg *config.Config, lightNode bool) (*Blockchain, error) {
 		// For light nodes, use an in-memory database with limited storage
 		dbOpts := &opt.Options{
 			WriteBuffer: 8 * opt.MiB,
-			// Use a bloom filter to speed up lookups
-			Filter: opt.NewBloomFilter(10),
+			// Use default filter
 		}
 		
 		// Create a temporary directory for the database
@@ -783,7 +784,7 @@ func (bc *Blockchain) createRewardTransaction(toAddress string, amount uint64, m
 	txin := TxInput{
 		TxID:        [32]byte{},
 		OutputIndex: 0xFFFFFFFE, // Special value for node reward transactions
-		Signature:   []byte{memo},
+		Signature:   []byte(memo),
 		PublicKey:   []byte{},
 	}
 	

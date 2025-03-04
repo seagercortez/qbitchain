@@ -1,0 +1,33 @@
+data_dir: /Users/seagercortez/.qbitchain
+network_type: livenet
+log_level: info
+api_enabled: true
+api_port: 8545
+network:
+    listen_address: 0.0.0.0:9000
+    bootstrap_nodes:
+        - /ip4/127.0.0.1/tcp/9000/p2p/QmBootstrap1
+        - /ip4/127.0.0.1/tcp/9001/p2p/QmBootstrap2
+    max_peers: 25
+    handshake_timeout: 30
+blockchain:
+    genesis_file: ""
+    max_block_size: 1048576
+    target_block_time: 60
+transaction:
+    min_gas_price: 1000000000
+    max_gas_limit: 12500000
+mining:
+    enabled: false
+    miner_address: ""
+    miner_threads: 0
+    miner_gas_floor: 8000000
+    miner_gas_ceiling: 12000000
+node_rewards:
+    enabled: false
+    reward_address: ""
+    full_node_percent: 3
+    light_node_percent: 1
+    tx_process_percent: 5
+wallet:
+    keystore_dir: /Users/seagercortez/.qbitchain/keystore
