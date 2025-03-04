@@ -1,0 +1,48 @@
+# QBitChain Testnet Configuration
+
+# General settings
+data_dir: "~/.qbitchain/testnet"
+network_type: "testnet"
+log_level: "debug"
+api_enabled: true
+api_port: 8546
+
+# Network settings
+network:
+  listen_address: "0.0.0.0:9001"
+  bootstrap_nodes:
+    - "/ip4/127.0.0.1/tcp/9001/p2p/QmTestnetBootstrap1"
+    - "/ip4/127.0.0.1/tcp/9002/p2p/QmTestnetBootstrap2"
+  max_peers: 50
+  handshake_timeout: 30
+
+# Blockchain settings
+blockchain:
+  genesis_file: ""  # Use default genesis block
+  max_block_size: 2097152  # 2MB - larger for testnet to allow more testing
+  target_block_time: 30    # 30 seconds - faster for testnet to speed up testing
+
+# Transaction settings
+transaction:
+  min_gas_price: 100000000  # Lower for testnet
+  max_gas_limit: 15000000   # Higher for testnet
+
+# Mining settings
+mining:
+  enabled: false
+  miner_address: ""
+  miner_threads: 1
+  miner_gas_floor: 8000000
+  miner_gas_ceiling: 15000000
+
+# Node rewards settings
+node_rewards:
+  enabled: true  # Enabled by default on testnet for testing
+  reward_address: ""
+  full_node_percent: 5.0    # 5% of block reward to full nodes
+  light_node_percent: 2.0   # 2% of block reward to light nodes
+  tx_process_percent: 10.0  # 10% of transaction fees to processors
+
+# Wallet settings
+wallet:
+  keystore_dir: "~/.qbitchain/testnet/keystore"

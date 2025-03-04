@@ -1,0 +1,49 @@
+# QBitChain Livenet Configuration
+
+# General settings
+data_dir: "~/.qbitchain/livenet"
+network_type: "livenet"
+log_level: "info"
+api_enabled: true
+api_port: 8545
+
+# Network settings
+network:
+  listen_address: "0.0.0.0:9000"
+  bootstrap_nodes:
+    - "/ip4/bootstrap1.qbitchain.net/tcp/9000/p2p/QmLivenetBootstrap1"
+    - "/ip4/bootstrap2.qbitchain.net/tcp/9000/p2p/QmLivenetBootstrap2"
+    - "/ip4/bootstrap3.qbitchain.net/tcp/9000/p2p/QmLivenetBootstrap3"
+  max_peers: 100
+  handshake_timeout: 30
+
+# Blockchain settings
+blockchain:
+  genesis_file: ""  # Use default genesis block
+  max_block_size: 1048576  # 1MB
+  target_block_time: 60    # 60 seconds
+
+# Transaction settings
+transaction:
+  min_gas_price: 1000000000  # 1 Gwei
+  max_gas_limit: 12500000    # Similar to Ethereum's limit
+
+# Mining settings
+mining:
+  enabled: false
+  miner_address: ""
+  miner_threads: 0  # Use all available cores
+  miner_gas_floor: 8000000
+  miner_gas_ceiling: 12000000
+
+# Node rewards settings
+node_rewards:
+  enabled: true
+  reward_address: ""
+  full_node_percent: 3.0    # 3% of block reward to full nodes
+  light_node_percent: 1.0   # 1% of block reward to light nodes
+  tx_process_percent: 5.0   # 5% of transaction fees to processors
+
+# Wallet settings
+wallet:
+  keystore_dir: "~/.qbitchain/livenet/keystore"
